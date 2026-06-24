@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>APEXカスタム自動集計</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@900&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Segoe UI', 'Meiryo', sans-serif;
@@ -47,7 +48,7 @@
       font-size: 1em;
     }
     .apex-btn {
-      background: linear-gradient(90deg, #b71c1c 60%, #222 100%);
+      background: #b71c1c;
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -59,7 +60,7 @@
       transition: background 0.2s, transform 0.1s;
     }
     .apex-btn:hover {
-      background: linear-gradient(90deg, #d32f2f 60%, #333 100%);
+      background: #d32f2f;
       transform: translateY(-2px) scale(1.04);
     }
     .card-list {
@@ -108,9 +109,9 @@
       box-shadow: 0 2px 8px #0006;
       display: inline-block;
     }
-    .team-table .badge-1 { background: linear-gradient(90deg, #ffd700 60%, #b71c1c 100%); color: #222; }
-    .team-table .badge-2 { background: linear-gradient(90deg, #c0c0c0 60%, #b71c1c 100%); color: #222; }
-    .team-table .badge-3 { background: linear-gradient(90deg, #cd7f32 60%, #b71c1c 100%); color: #222; }
+    .team-table .badge-1 { background: #ffd700; color: #222; }
+    .team-table .badge-2 { background: #c0c0c0; color: #222; }
+    .team-table .badge-3 { background: #cd7f32; color: #222; }
     .team-table .badge-other { background: #b71c1c; }
     .team-table .total-point-badge {
       background: #ffd700;
@@ -194,14 +195,14 @@
       margin: 24px 0 0 0;
     }
     .rankpoint-table {
+      display: block;
       background: #23272b;
       border-radius: 12px;
-      box-shadow: 0 2px 8px #0006;
+      border: 1px solid #444;
       margin: 0 auto 0 auto;
       padding: 12px 18px 8px 18px;
       min-width: 600px;
       width: max-content;
-      border-collapse: separate;
     }
     .rankpoint-table th, .rankpoint-table td {
       border: none;
@@ -294,8 +295,8 @@
     // --- ここからキルポイント上限設定用 ---
     let killLimitMode = 'off'; // 'off' | 'all' | 'some'
     let killLimitAll = 5; // 全体適用時の上限値（デフォルト5）
-    let killLimitSome = [5,5,5,5,5,5,5,5,5,5]; // 一部適用時の上限値（最大10試合分、デフォルト5）
-    let killLimitSomeEnabled = [false,false,false,false,false,false,false,false,false,false]; // 一部適用時、どの試合に適用するか
+    let killLimitSome = [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]; // 一部適用時の上限値（最大20試合分、デフォルト5）
+    let killLimitSomeEnabled = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false]; // 一部適用時、どの試合に適用するか
 
     // --- キルポイント上限設定用関数 ---
     function setKillLimitMode(mode) {
@@ -319,7 +320,7 @@
       // ここで最新の値を取得
       const matchCountInput = document.getElementById('matchCount');
       if (matchCountInput) {
-        matchCount = Math.min(10, Math.max(1, parseInt(matchCountInput.value)));
+        matchCount = Math.min(20, Math.max(1, parseInt(matchCountInput.value)));
       }
       // 既存データを保持しつつ拡張
       for(let i=0; i<20; i++) {
@@ -349,11 +350,11 @@
 
     function renderSetupArea() {
       let html = '<div class="section-title">【入力】チーム・試合データ入力</div>';
-      // タイトル入力欄はここから削除
-      // 上段：中央揃えで順位ポイント設定＋試合数枠（右横）
-      html += `<div style="display:flex;justify-content:center;align-items:flex-start;gap:32px;margin-bottom:0;">`;
-      // 左カラム：順位ポイント設定＋キルポイント上限設定（縦並び）
-      html += `<div style="display:flex;flex-direction:column;align-items:center;">`;
+      // 全体ラッパー（縦並び・中央揃え）
+      html += `<div style="display:flex;flex-direction:column;align-items:center;gap:18px;">`;
+
+      // 上段：順位ポイント設定 ＋ 試合数枠（常に横並び）
+      html += `<div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:nowrap;">`;
       // 順位ポイント設定
       html += `<div class="rankpoint-table" style="margin:0;"><h3>順位ポイント設定</h3><table>`;
       // 1～10位
@@ -377,8 +378,21 @@
       }
       html += '</tr>';
       html += '</table></div>';
-      // --- キルポイント上限設定UI追加（ここで縦並び） ---
-      html += `<div class="rankpoint-table" style="margin:0;margin-top:18px;min-width:600px;width:max-content;padding:12px 18px 8px 18px;">`;
+      // 試合数枠＋ボタン（常に順位ポイント設定の右）
+      html += `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;">`;
+      html += `<div class="rankpoint-table" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:180px;max-width:220px;padding:12px 18px 8px 18px;">`;
+      html += `<label style="color:#fff;font-size:1.1em;width:100%;text-align:center;">試合数（1～20）<br><input type="number" id="matchCount" min="1" max="20" value="${matchCount}" style="width:60px;padding:4px 8px;border-radius:6px;border:none;background:#222;color:#fff;margin-top:8px;font-size:1.2em;text-align:center;"></label>`;
+      html += `</div>`;
+      html += `<div style="display:flex;justify-content:center;gap:8px;">`;
+      html += `<button class="apex-btn setup-btn" onclick="setupTable()">更新</button>`;
+      html += `<button class="apex-btn setup-btn" onclick="saveDataAsJson()">保存</button>`;
+      html += `<label class="apex-btn setup-btn" style="margin:0;cursor:pointer;">読み込み<input type="file" id="loadJsonInput" accept="application/json" style="display:none;" onchange="loadDataFromJson(event)"></label>`;
+      html += `</div>`;
+      html += `</div>`;
+      html += `</div>`; // 上段ここまで
+
+      // 下段：キルポイント上限設定
+      html += `<div class="rankpoint-table" style="margin:0;min-width:600px;max-width:100%;width:auto;box-sizing:border-box;padding:12px 18px 8px 18px;">`;
       html += `<h3>キルポイント上限設定</h3>`;
       html += `<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">`;
       html += `<label><input type="radio" name="killLimitMode" value="off" ${killLimitMode==='off'?'checked':''} onchange="setKillLimitMode('off')">上限なし</label>`;
@@ -391,32 +405,22 @@
       html += `</div>`;
       // 一部適用
       html += `<div id="killLimitSomeWrap" style="margin-top:8px;${killLimitMode!=='some'?'display:none;':''}">`;
-      html += `<table style="border:none;background:none;"><tr>`;
+      html += `<div style="display:flex;flex-wrap:wrap;gap:6px 4px;">`;
       for(let m=0;m<matchCount;m++){
-        html += `<td style="padding:2px 6px;">`;
-        html += `<label><input type="checkbox" ${killLimitSomeEnabled[m]?'checked':''} onchange="setKillLimitSomeEnabled(${m},this.checked)">${m+1}試合目</label><br>`;
-        html += `<input type="number" min="0" max="15" value="${killLimitSome[m]}" style="width:60px;background:#18191c;color:#fff;border-radius:4px;border:none;text-align:center;" onchange="setKillLimitSome(${m},this.value)">`;
-        html += `</td>`;
+        html += `<div style="display:flex;flex-direction:column;align-items:center;padding:2px 6px;min-width:70px;">`;
+        html += `<label style="white-space:nowrap;"><input type="checkbox" ${killLimitSomeEnabled[m]?'checked':''} onchange="setKillLimitSomeEnabled(${m},this.checked)">${m+1}試合目</label>`;
+        html += `<input type="number" min="0" max="15" value="${killLimitSome[m]}" style="width:60px;background:#18191c;color:#fff;border-radius:4px;border:none;text-align:center;margin-top:2px;" onchange="setKillLimitSome(${m},this.value)">`;
+        html += `</div>`;
       }
-      html += `</tr></table>`;
       html += `</div>`;
       html += `</div>`;
-      html += `</div>`; // 左カラムここまで
-      // 試合数枠（右横）
-      html += `<div><div class="rankpoint-table" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:180px;max-width:220px;padding:12px 18px 8px 18px;margin-top:32px;">`;
-      html += `<label style="color:#fff;font-size:1.1em;width:100%;text-align:center;">試合数（1～10）<br><input type="number" id="matchCount" min="1" max="10" value="${matchCount}" style="width:60px;padding:4px 8px;border-radius:6px;border:none;background:#222;color:#fff;margin-top:8px;font-size:1.2em;text-align:center;"></label>`;
-      html += `</div>`;
-      // ボタンを試合数枠の直下、中央揃えで独立して配置
-      html += `<div style="display:flex;justify-content:center;gap:8px;margin:18px 0 0 0;">`;
-      html += `<button class="apex-btn setup-btn" onclick="setupTable()">更新</button>`;
-      html += `<button class="apex-btn setup-btn" onclick="saveDataAsJson()">保存</button>`;
-      html += `<label class="apex-btn setup-btn" style="margin:0;cursor:pointer;">読み込み<input type="file" id="loadJsonInput" accept="application/json" style="display:none;" onchange="loadDataFromJson(event)"></label>`;
-      html += `</div></div>`;
-      html += `</div>`;
+      html += `</div>`; // キルポイント上限設定ここまで
+
+      html += `</div>`; // 全体ラッパーここまで
       // チームカード入力
       html += '<div class="card-list"><table class="team-table">';
       // ヘッダー
-      html += '<tr><th>順位</th><th class="team-name-sticky">チーム名</th><th>総合P</th>';
+      html += '<tr><th>番号</th><th class="team-name-sticky">チーム名</th><th>総合P</th>';
       for(let m=0; m<matchCount; m++) {
         const borderClass = m > 0 ? 'match-border' : '';
         const stripeClass = `stripe-bg-${m%2}`;
@@ -427,7 +431,7 @@
       teamData.forEach((team, i) => {
         const total = calcTotal(team);
         html += `<tr>`;
-        html += `<td><span class="badge ${getBadgeClass(i)}">${getBadgeText(i)}</span></td>`;
+        html += `<td>${i+1}</td>`;
         html += `<td><input class="team-name-input" type="text" value="${team.name}" onchange="updateTeamName(${i}, this.value)"></td>`;
         html += `<td><span class="total-point-badge">${total} pt</span></td>`;
         for(let m=0; m<matchCount; m++) {
@@ -489,9 +493,9 @@
       return 'badge-other';
     }
     function getBadgeText(i) {
-      if(i===0) return '🥇1位';
-      if(i===1) return '🥈2位';
-      if(i===2) return '🥉3位';
+      // medal removed
+      // medal removed
+      // medal removed
       return `${i+1}位`;
     }
 
@@ -532,11 +536,14 @@
       teams.sort((a,b)=>b.total-a.total); // 常に総合ポイント順
       let html = '<div class="section-title">【集計結果】</div>';
       // タイトル入力欄
-      html += `<div style=\"display:flex;justify-content:center;align-items:center;margin-bottom:12px;gap:16px;\">
+      html += `<div style=\"display:flex;justify-content:center;align-items:center;margin-bottom:12px;gap:16px;flex-wrap:wrap;\">
         <label style=\"color:#fff;font-size:1.1em;\">画像タイトル：<input type=\"text\" id=\"exportTitle\" style=\"width:320px;padding:4px 8px;border-radius:6px;border:none;background:#222;color:#fff;font-size:1.1em;\" placeholder=\"例：第1回APEXカスタム大会 結果\"></label>
       </div>`;
       // ボタン
-      let resultBtnHtml = '<div style="display:flex;justify-content:center;margin-bottom:12px;"><button class="apex-btn setup-btn" id="exportResultBtn" style="min-width:220px;max-width:320px;white-space:nowrap;font-size:1.15em;">集計結果画像出力</button></div>';
+      let resultBtnHtml = `<div style="display:flex;justify-content:center;align-items:center;margin-bottom:12px;gap:10px;">
+        <label class="apex-btn setup-btn" style="margin:0;cursor:pointer;font-size:0.9em;min-width:120px;max-width:180px;padding:6px 0;text-align:center;">背景画像を選択<input type="file" id="exportBgImage" accept="image/*" style="display:none;"></label>
+        <button class="apex-btn setup-btn" id="exportResultBtn" style="min-width:220px;max-width:320px;white-space:nowrap;font-size:1.15em;">集計結果画像出力</button>
+      </div>`;
       // 集計結果テーブル
       let tableHtml = '<div class="card-list"><table class="team-table">';
       tableHtml += '<tr><th>順位</th><th class="team-name-sticky">チーム名</th><th>総順位P</th><th>総キルP</th><th>総合P</th></tr>';
@@ -643,20 +650,28 @@
         })()
       }));
       teams.sort((a,b)=>b.total-a.total);
+      const bgFile = document.getElementById('exportBgImage') ? document.getElementById('exportBgImage').files[0] : null;
+      const buildContainer = (bgUrl) => {
       let container = document.createElement('div');
       container.style.width = '1920px';
       container.style.height = '1080px';
       container.style.background = '#18191c';
       container.style.position = 'relative';
+      if (bgUrl) {
+        container.style.backgroundImage = `url(${bgUrl})`;
+        container.style.backgroundSize = 'cover';
+        container.style.backgroundPosition = 'center';
+      }
       // タイトル部
       let titleDiv = document.createElement('div');
       titleDiv.style.position = 'absolute';
-      titleDiv.style.top = '48px';
+      titleDiv.style.top = '148px';
       titleDiv.style.left = '0';
       titleDiv.style.width = '100%';
       titleDiv.style.textAlign = 'center';
-      titleDiv.style.fontSize = '2.6em';
+      titleDiv.style.fontSize = '3.2em';
       titleDiv.style.fontWeight = 'bold';
+      titleDiv.style.fontFamily = "'Noto Sans JP', sans-serif";
       titleDiv.style.color = '#ffd700';
       titleDiv.style.letterSpacing = '0.05em';
       titleDiv.style.textShadow = '2px 2px 8px #000a';
@@ -665,15 +680,22 @@
       // テーブル部
       let tablesWrap = document.createElement('div');
       tablesWrap.style.position = 'absolute';
-      tablesWrap.style.top = '50%';
+      tablesWrap.style.top = '55%';
       tablesWrap.style.left = '50%';
       tablesWrap.style.transform = 'translate(-50%, -50%)';
       tablesWrap.style.display = 'flex';
       tablesWrap.style.justifyContent = 'center';
       tablesWrap.style.alignItems = 'flex-start';
-      tablesWrap.style.gap = '32px';
+      tablesWrap.style.gap = '12px';
       // 1-10位
-      let html1 = '<table class="team-table" style="font-size:1.4em;width:900px;margin:0 16px;background:#18191c;">';
+      let html1 = '<table class="team-table" style="font-size:1.25em;width:820px;margin:0 4px;background:#18191c;table-layout:fixed;">';
+      html1 += '<colgroup>';
+      html1 += '<col style="width:120px">';
+      html1 += '<col style="width:360px">';
+      html1 += '<col style="width:90px">';
+      html1 += '<col style="width:90px">';
+      html1 += '<col style="width:130px">';
+      html1 += '</colgroup>';
       html1 += '<tr>';
       html1 += '<th style="background:#b71c1c;">順位</th>';
       html1 += '<th style="background:#b71c1c;">チーム名</th>';
@@ -685,11 +707,11 @@
         html1 += `<tr>`;
         let badgeBg = '#b71c1c';
         let badgeColor = '#fff';
-        if(i===0) { badgeBg = 'linear-gradient(90deg, #ffd700 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        else if(i===1) { badgeBg = 'linear-gradient(90deg, #c0c0c0 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        else if(i===2) { badgeBg = 'linear-gradient(90deg, #cd7f32 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        html1 += `<td style=\"background:#18191c;\"><span class=\"badge\" style=\"background:${badgeBg};box-shadow:none;color:${badgeColor};\">${getBadgeText(i)}</span></td>`;
-        html1 += `<td class=\"team-name-cell\" style=\"background:#18191c;\">${team.name}</td>`;
+        if(i===0) { badgeBg = '#ffd700'; badgeColor = '#222'; }
+        else if(i===1) { badgeBg = '#c0c0c0'; badgeColor = '#222'; }
+        else if(i===2) { badgeBg = '#cd7f32'; badgeColor = '#222'; }
+        html1 += `<td style=\"background:#18191c;\"><span class=\"badge\" style=\"background:${badgeBg};box-shadow:none;color:${badgeColor};min-width:3em;display:inline-block;\">${getBadgeText(i)}</span></td>`;
+        html1 += `<td class=\"team-name-cell\" style=\"background:#18191c;white-space:normal;word-break:break-all;\">${team.name}</td>`;
         html1 += `<td style=\"background:#18191c;\">${team.totalRank}</td>`;
         html1 += `<td style=\"background:#18191c;\">${team.totalKill}`;
         if(team.killLimitMinus){
@@ -700,7 +722,14 @@
         html1 += `</tr>`;
       });
       html1 += '</table>';
-      let html2 = '<table class="team-table" style="font-size:1.4em;width:900px;margin:0 16px;background:#18191c;">';
+      let html2 = '<table class="team-table" style="font-size:1.25em;width:820px;margin:0 4px;background:#18191c;table-layout:fixed;">';
+      html2 += '<colgroup>';
+      html2 += '<col style="width:120px">';
+      html2 += '<col style="width:360px">';
+      html2 += '<col style="width:90px">';
+      html2 += '<col style="width:90px">';
+      html2 += '<col style="width:130px">';
+      html2 += '</colgroup>';
       html2 += '<tr>';
       html2 += '<th style="background:#b71c1c;">順位</th>';
       html2 += '<th style="background:#b71c1c;">チーム名</th>';
@@ -712,11 +741,11 @@
         html2 += `<tr>`;
         let badgeBg = '#b71c1c';
         let badgeColor = '#fff';
-        if(i+10===0) { badgeBg = 'linear-gradient(90deg, #ffd700 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        else if(i+10===1) { badgeBg = 'linear-gradient(90deg, #c0c0c0 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        else if(i+10===2) { badgeBg = 'linear-gradient(90deg, #cd7f32 60%, #b71c1c 100%)'; badgeColor = '#222'; }
-        html2 += `<td style=\"background:#18191c;\"><span class=\"badge\" style=\"background:${badgeBg};box-shadow:none;color:${badgeColor};\">${getBadgeText(i+10)}</span></td>`;
-        html2 += `<td class=\"team-name-cell\" style=\"background:#18191c;\">${team.name}</td>`;
+        if(i+10===0) { badgeBg = '#ffd700'; badgeColor = '#222'; }
+        else if(i+10===1) { badgeBg = '#c0c0c0'; badgeColor = '#222'; }
+        else if(i+10===2) { badgeBg = '#cd7f32'; badgeColor = '#222'; }
+        html2 += `<td style=\"background:#18191c;\"><span class=\"badge\" style=\"background:${badgeBg};box-shadow:none;color:${badgeColor};min-width:3em;display:inline-block;\">${getBadgeText(i+10)}</span></td>`;
+        html2 += `<td class=\"team-name-cell\" style=\"background:#18191c;white-space:normal;word-break:break-all;\">${team.name}</td>`;
         html2 += `<td style=\"background:#18191c;\">${team.totalRank}</td>`;
         html2 += `<td style=\"background:#18191c;\">${team.totalKill}`;
         if(team.killLimitMinus){
@@ -729,19 +758,33 @@
       html2 += '</table>';
       tablesWrap.innerHTML = html1 + html2;
       container.appendChild(tablesWrap);
-      document.body.appendChild(container);
-      html2canvas(container, {width:1920, height:1080, backgroundColor:'#18191c'}).then(canvas => {
-        let link = document.createElement('a');
-        link.download = 'apex_result.png';
-        link.href = canvas.toDataURL();
-        // iOS Safari用: 新しいタブで画像を開く
-        if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
-          window.open(canvas.toDataURL());
-        } else {
-          link.click();
-        }
-        document.body.removeChild(container);
-      });
+      return container;
+      }; // buildContainer end
+
+      const runExport = (bgUrl) => {
+        const container = buildContainer(bgUrl);
+        document.body.appendChild(container);
+        html2canvas(container, {width:1920, height:1080, backgroundColor:'#18191c', useCORS:true}).then(canvas => {
+          let link = document.createElement('a');
+          link.download = 'apex_result.png';
+          link.href = canvas.toDataURL();
+          // iOS Safari用: 新しいタブで画像を開く
+          if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
+            window.open(canvas.toDataURL());
+          } else {
+            link.click();
+          }
+          document.body.removeChild(container);
+        });
+      };
+
+      if (bgFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => runExport(e.target.result);
+        reader.readAsDataURL(bgFile);
+      } else {
+        runExport(null);
+      }
     }
   </script>
 </body>
